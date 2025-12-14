@@ -1,30 +1,27 @@
 package com.example.packetworld
-import android.util.Log
-
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.packetworld.MainActivity // Tu pantalla principal
 import com.example.packetworld.databinding.ActivityLoginBinding
-import com.example.packetworld.dominio.ConductorImp // Importamos la implementación del Repositorio
-import com.example.packetworld.poko.Colaborador // Importamos el POKO
+import com.example.packetworld.dominio.ColaboradorImp
+import com.example.packetworld.dto.RSAutenticacionColaborador
+import com.example.packetworld.poko.Colaborador
+import com.google.gson.Gson
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-
-    private lateinit var conductorImp: ConductorImp
+    private lateinit var colaboradorImp: ColaboradorImp
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Inicializar el ConductorImp pasándole el contexto
-        conductorImp = ConductorImp(this)
-
+        colaboradorImp = ColaboradorImp(this)
 
         binding.btnLogin.setOnClickListener {
             iniciarSesion()
@@ -32,34 +29,41 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun iniciarSesion() {
-        if (sonCamposValidos()) {
 
-            val numPersonal = binding.etNumPersonal.text.toString()
-            val password = binding.etPassword.text.toString()
+        if (!sonCamposValidos()) return
 
-            // Llamada al ConductorImp (Delegación de la lógica de negocio y red)
-            conductorImp.iniciarSesion(numPersonal, password) { colaborador ->
+        val numPersonal = binding.etNumPersonal.text.toString()
+        val password = binding.etPassword.text.toString()
 
+        colaboradorImp.iniciarSesion(numPersonal, password) { colaborador: Colaborador? ->
 
-                if (colaborador != null) {
+            if (colaborador != null) {
 
-                    Toast.makeText(
-                        this,
-                        "Bienvenido(a) ${colaborador.nombre}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                Toast.makeText(
+                    this,
+                    "Bienvenido(a) ${colaborador.nombre}",
+                    Toast.LENGTH_SHORT
+                ).show()
 
-                    irPantallaPrincipal()
+                val respuestaLogin = RSAutenticacionColaborador(
+                    error = false,
+                    mensaje = "Login correcto",
+                    colaborador = colaborador
+                )
 
-                }
+                val gson = Gson()
+                val jsonRespuesta = gson.toJson(respuestaLogin)
 
+                val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra("colaborador", jsonRespuesta)
+                startActivity(intent)
+
+                finish()
             }
-
         }
     }
 
     private fun sonCamposValidos(): Boolean {
-        // La lógica de validación de UI se mantiene aquí
         var valido = true
 
         if (binding.etNumPersonal.text.isEmpty()) {
@@ -73,12 +77,5 @@ class LoginActivity : AppCompatActivity() {
         }
 
         return valido
-    }
-
-    private fun irPantallaPrincipal() {
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
-        // Es crucial llamar a finish() para que el usuario no pueda volver al login con el botón 'Atrás'
-        finish()
     }
 }
