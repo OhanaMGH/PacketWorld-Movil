@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f5f5f5"
+    tools:context=".MainActivity">
+
+    <View
+        android:id="@+id/header_background"
+        android:layout_width="match_parent"
+        android:layout_height="210dp"
+        android:background="#00A389"
+        />
+    <TextView
+        android:id="@+id/tv_saludo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="30dp"
+        android:text="Hola, Carlos"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_bienvenido"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_saludo"
+        android:layout_marginStart="24dp"
+        android:text="Bienvenido de nuevo"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp" />
+
+    <ImageView
+        android:id="@+id/iv_foto_perfil"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="24dp"
+
+        android:src="@drawable/icon_usuario"
+        android:tint="@android:color/white"
+        />
+
+    <LinearLayout
+        android:id="@+id/layout_resumen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_bienvenido"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:background="#4DFFFFFF"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tv_label_envios"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Envíos hoy"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_label_envios"
+                android:layout_marginTop="8dp"
+                android:text="4"
+                android:textColor="@android:color/white"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:background="#4DFFFFFF"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tv_label_completados"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Completados"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_label_completados"
+                android:layout_marginTop="8dp"
+                android:text="1"
+                android:textColor="@android:color/white"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_lista_envios"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/layout_resumen"
+        android:layout_marginTop="25dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="16dp">
+
+            <TextView
+                android:id="@+id/tv_codigo_envio1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PW-2024-001234"
+                android:textColor="#000000"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:background="#E8F5E9"
+                android:paddingStart="8dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="2dp"
+                android:text="En tránsito"
+                android:textColor="#4CAF50"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/iv_pin1"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_below="@id/tv_codigo_envio1"
+                android:layout_marginTop="8dp"
+                android:src="@android:drawable/ic_dialog_map"
+                android:tint="#000000" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_codigo_envio1"
+                android:layout_toEndOf="@id/iv_pin1"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="Av. Paseo de la Reforma 505, Mexico City"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="#f5f5f5" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
+
+            <TextView
+                android:id="@+id/tv_codigo_envio3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PW-2024-001235"
+                android:textColor="#000000"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:background="#E8F5E9"
+                android:paddingStart="8dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="2dp"
+                android:text="En tránsito"
+                android:textColor="#4CAF50"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/iv_pin3"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_below="@id/tv_codigo_envio3"
+                android:layout_marginTop="8dp"
+                android:src="@android:drawable/ic_dialog_map"
+                android:tint="#000000" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_codigo_envio3"
+                android:layout_toEndOf="@id/iv_pin3"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="Blvd. Kukulkán Km 4, Cancun"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="14sp" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="#f5f5f5" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
+
+            <TextView
+                android:id="@+id/tv_codigo_envio2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PW-2024-001236"
+                android:textColor="#00A389"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:background="#FFEBEE"
+                android:paddingStart="8dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="2dp"
+                android:text="Detenido"
+                android:textColor="#F44336"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/iv_pin2"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_below="@id/tv_codigo_envio2"
+                android:layout_marginTop="8dp"
+                android:src="@android:drawable/ic_dialog_map"
+                android:tint="#00A389" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_codigo_envio2"
+                android:layout_toEndOf="@id/iv_pin2"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="Calle 5 de Mayo 100, Monterrey"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="14sp" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="#f5f5f5" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="16dp">
+
+            <TextView
+                android:id="@+id/tv_codigo_envio4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PW-2024-001237"
+                android:textColor="#00A389"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:background="#e0e0e0"
+                android:paddingStart="8dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="2dp"
+                android:text="Entregado"
+                android:textColor="#757575"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/iv_pin4"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_below="@id/tv_codigo_envio4"
+                android:layout_marginTop="8dp"
+                android:src="@android:drawable/ic_dialog_map"
+                android:tint="#00A389" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_codigo_envio4"
+                android:layout_toEndOf="@id/iv_pin4"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="Avenida Chapultepec 123, Guadalajara"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="14sp" />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/iv_refrescar"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="24dp"
+        android:layout_marginEnd="24dp"
+        android:src="@drawable/icon_refresh"
+        android:background="#FF5722"
+        android:padding="16dp"
+        android:tint="@android:color/white"
+        android:elevation="6dp" />
+</RelativeLayout>

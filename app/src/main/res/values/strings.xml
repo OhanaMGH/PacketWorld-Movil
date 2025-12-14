@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Packet World App</string>
+    <string name="title_activity_profile_user">ProfileUserActivity</string>
+</resources>
