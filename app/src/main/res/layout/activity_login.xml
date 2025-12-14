@@ -11,23 +11,12 @@
     <!-- LOGO -->
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="250dp"
+        android:layout_height="200dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="40dp"
-        android:src="@drawable/packet_world"/>
+        android:src="@drawable/packet_world" />
 
-    <!-- TÍTULO -->
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Packet-World"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        android:textColor="#0C3C72"
-        android:layout_marginTop="16dp"
-        android:layout_gravity="center_horizontal"/>
 
     <!-- SUBTÍTULO -->
     <TextView
@@ -37,7 +26,6 @@
         android:text="Gestor de Envíos"
         android:textSize="14sp"
         android:textColor="#6C6C6C"
-        android:layout_marginTop="4dp"
         android:layout_gravity="center_horizontal"/>
 
     <!-- TARJETA -->
