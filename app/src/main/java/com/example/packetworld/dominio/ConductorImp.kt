@@ -27,11 +27,6 @@ class ConductorImp(private val context: Context) {
         val parametrosBody = "noPersonal=$usuario&password=$contrasenia"
         val url = "${Constantes.URL_API}colaborador/login"
 
-        // 🔍 LOGS DE SALIDA
-        Log.d(TAG, "================ LOGIN REQUEST ================")
-        Log.d(TAG, "URL: $url")
-        Log.d(TAG, "BODY: $parametrosBody")
-        Log.d(TAG, "CONTENT-TYPE: $contentTypeForm")
 
         ConexionAPI.peticionBODY(
             context,
@@ -41,34 +36,20 @@ class ConductorImp(private val context: Context) {
             contentTypeForm
         ) { respuestaConexion: RespuestaHTTP ->
 
-            // 🔍 LOGS DE RESPUESTA
-            Log.d(TAG, "================ LOGIN RESPONSE ================")
-            Log.d(TAG, "HTTP CODE: ${respuestaConexion.codigo}")
-            Log.d(TAG, "RAW RESPONSE: ${respuestaConexion.contenido}")
-
             if (respuestaConexion.codigo == 200) {
 
                 try {
-                    Log.d(TAG, "Intentando parsear RSAutenticacionColaborador")
-
                     val respuestaLogin: RSAutenticacionColaborador =
                         gson.fromJson(
                             respuestaConexion.contenido,
                             RSAutenticacionColaborador::class.java
                         )
 
-                    Log.d(TAG, "DTO PARSEADO: error=${respuestaLogin.error}")
-                    Log.d(TAG, "MENSAJE: ${respuestaLogin.mensaje}")
-                    Log.d(TAG, "COLABORADOR: ${respuestaLogin.colaborador}")
 
                     if (!respuestaLogin.error && respuestaLogin.colaborador != null) {
-
-                        Log.d(TAG, "LOGIN EXITOSO")
                         callback(respuestaLogin.colaborador)
 
                     } else {
-
-                        Log.e(TAG, "ERROR DE NEGOCIO")
                         Toast.makeText(
                             context,
                             respuestaLogin.mensaje ?: "Credenciales incorrectas",
@@ -79,9 +60,6 @@ class ConductorImp(private val context: Context) {
                     }
 
                 } catch (e: JsonSyntaxException) {
-
-                    Log.e(TAG, "JSON MAL FORMADO", e)
-
                     try {
                         val respuestaError: Respuesta =
                             gson.fromJson(respuestaConexion.contenido, Respuesta::class.java)
@@ -93,9 +71,6 @@ class ConductorImp(private val context: Context) {
                         ).show()
 
                     } catch (e2: Exception) {
-
-                        Log.e(TAG, "NO SE PUDO PARSEAR RESPUESTA DE ERROR", e2)
-
                         Toast.makeText(
                             context,
                             Constantes.MSJ_ERROR_URL,
@@ -106,9 +81,6 @@ class ConductorImp(private val context: Context) {
                     callback(null)
 
                 } catch (e: Exception) {
-
-                    Log.e(TAG, "ERROR GENERAL AL PROCESAR LOGIN", e)
-
                     Toast.makeText(
                         context,
                         "Error interno del sistema",
@@ -119,9 +91,6 @@ class ConductorImp(private val context: Context) {
                 }
 
             } else if (respuestaConexion.codigo == Constantes.ERROR_PETICION) {
-
-                Log.e(TAG, "ERROR DE CONEXIÓN / RED")
-
                 Toast.makeText(
                     context,
                     Constantes.MSJ_ERROR_PETICION,
@@ -131,9 +100,6 @@ class ConductorImp(private val context: Context) {
                 callback(null)
 
             } else {
-
-                Log.e(TAG, "ERROR HTTP NO CONTROLADO: ${respuestaConexion.codigo}")
-
                 Toast.makeText(
                     context,
                     Constantes.MSJ_ERROR_URL,
