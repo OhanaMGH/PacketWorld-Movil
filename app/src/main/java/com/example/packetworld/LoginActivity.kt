@@ -15,7 +15,6 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
 
-
     private lateinit var conductorImp: ConductorImp
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,30 +40,19 @@ class LoginActivity : AppCompatActivity() {
             // Llamada al ConductorImp (Delegación de la lógica de negocio y red)
             conductorImp.iniciarSesion(numPersonal, password) { colaborador ->
 
-                Log.e("LOGIN", "Callback ejecutado")
-                Log.e("LOGIN", "Colaborador recibido: $colaborador")
 
                 if (colaborador != null) {
-                    try {
-                        Log.e("LOGIN", "Nombre: ${colaborador.nombre}")
-                        Log.e("LOGIN", "Rol: ${colaborador.idRol}")
 
-                        Toast.makeText(
-                            this,
-                            "Bienvenido(a) ${colaborador.nombre}",
-                            Toast.LENGTH_LONG
-                        ).show()
+                    Toast.makeText(
+                        this,
+                        "Bienvenido(a) ${colaborador.nombre}",
+                        Toast.LENGTH_SHORT
+                    ).show()
 
-                        Log.e("LOGIN", "Antes de ir a MainActivity")
-                        irPantallaPrincipal()
-                        Log.e("LOGIN", "Después de ir a MainActivity")
+                    irPantallaPrincipal()
 
-                    } catch (e: Exception) {
-                        Log.e("LOGIN", "ERROR en UI", e)
-                    }
-                } else {
-                    Log.e("LOGIN", "Colaborador es NULL")
                 }
+
             }
 
         }
