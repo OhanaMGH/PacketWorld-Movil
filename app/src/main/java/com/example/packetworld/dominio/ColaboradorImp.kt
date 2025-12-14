@@ -1,7 +1,6 @@
 package com.example.packetworld.dominio
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import com.example.packetworld.conexion.ConexionAPI
 import com.example.packetworld.poko.RespuestaHTTP
@@ -12,11 +11,13 @@ import com.example.packetworld.util.Constantes
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 
-class ConductorImp(private val context: Context) {
+class ColaboradorImp(private val context: Context) {
 
     private val gson = Gson()
-    private val TAG = "LOGIN_API"
     private val contentTypeForm = "application/x-www-form-urlencoded"
+
+    // Rol permitido
+    private val ROL_REQUERIDO = "Conductor"
 
     fun iniciarSesion(
         usuario: String,
@@ -27,7 +28,6 @@ class ConductorImp(private val context: Context) {
         val parametrosBody = "noPersonal=$usuario&password=$contrasenia"
         val url = "${Constantes.URL_API}colaborador/login"
 
-
         ConexionAPI.peticionBODY(
             context,
             url,
@@ -37,7 +37,6 @@ class ConductorImp(private val context: Context) {
         ) { respuestaConexion: RespuestaHTTP ->
 
             if (respuestaConexion.codigo == 200) {
-
                 try {
                     val respuestaLogin: RSAutenticacionColaborador =
                         gson.fromJson(
@@ -45,9 +44,21 @@ class ConductorImp(private val context: Context) {
                             RSAutenticacionColaborador::class.java
                         )
 
+                    val colaborador = respuestaLogin.colaborador
 
-                    if (!respuestaLogin.error && respuestaLogin.colaborador != null) {
-                        callback(respuestaLogin.colaborador)
+                    if (!respuestaLogin.error && colaborador != null) {
+
+                        // Validación de rol
+                        if (colaborador.nombreRol == ROL_REQUERIDO) {
+                            callback(colaborador)
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Acceso denegado. Rol '${colaborador.nombreRol}' no permitido.",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            callback(null)
+                        }
 
                     } else {
                         Toast.makeText(
@@ -55,7 +66,6 @@ class ConductorImp(private val context: Context) {
                             respuestaLogin.mensaje ?: "Credenciales incorrectas",
                             Toast.LENGTH_LONG
                         ).show()
-
                         callback(null)
                     }
 
@@ -77,7 +87,6 @@ class ConductorImp(private val context: Context) {
                             Toast.LENGTH_LONG
                         ).show()
                     }
-
                     callback(null)
 
                 } catch (e: Exception) {
@@ -86,7 +95,6 @@ class ConductorImp(private val context: Context) {
                         "Error interno del sistema",
                         Toast.LENGTH_LONG
                     ).show()
-
                     callback(null)
                 }
 
@@ -96,7 +104,6 @@ class ConductorImp(private val context: Context) {
                     Constantes.MSJ_ERROR_PETICION,
                     Toast.LENGTH_LONG
                 ).show()
-
                 callback(null)
 
             } else {
@@ -105,7 +112,6 @@ class ConductorImp(private val context: Context) {
                     Constantes.MSJ_ERROR_URL,
                     Toast.LENGTH_LONG
                 ).show()
-
                 callback(null)
             }
         }
