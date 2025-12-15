@@ -1,18 +1,22 @@
 package com.example.packetworld.poko
 
 data class Colaborador(
-    val idColaborador: Int,
-    val noPersonal: String,
-    val nombre: String,
-    val apellidoPaterno: String,
-    val apellidoMaterno: String?,
-    val curp: String,
-    val correo: String,
-    val telefono: String?,
-    val fotoBase64: String?,
-    val numeroLicencia: String?,
-    val idRol: Int,
-    val idSucursal: Int,
-    val nombreRol: String
+    var idColaborador: Int,
+
+    var noPersonal: String?,
+    var nombre: String,
+    var apellidoPaterno: String,
+    var apellidoMaterno: String?,
+    var curp: String,
+    var correo: String,
+    var telefono: String?,
+    var foto: String?,
+    var password: String?,
+    var numeroLicencia: String?,
+
+    var idRol: Int?,
+    var idSucursal: Int?,
+    var nombreRol: String?
 )
+
 
