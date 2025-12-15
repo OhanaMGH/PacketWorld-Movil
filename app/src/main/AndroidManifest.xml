@@ -7,6 +7,18 @@
         android:label="PacketWorld"
         android:theme="@style/Theme.PacketWorld">
         <activity
+            android:name=".EdicionUsuarioActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditarPerfilActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PerfilUsuarioActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ActualizarEstatusEnvioActivity"
+            android:exported="false" />
+        <activity
             android:name=".DetalleEnvioActivity"
             android:exported="false" />
         <activity
