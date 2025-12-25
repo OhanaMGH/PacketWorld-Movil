@@ -66,4 +66,32 @@ object ConexionAPI {
                 callback(respuesta)
             }
     }
+
+    fun peticionBODYBytes(
+        context: Context,
+        url: String,
+        metodoHTTP: String,
+        parametros: ByteArray,
+        contentType: String,
+        callback: (RespuestaHTTP) -> Unit
+    ) {
+        val request: Builders.Any.B = Ion.with(context).load(metodoHTTP, url)
+
+        request.setHeader("Content-Type", contentType)
+            .setByteArrayBody(parametros)
+            .asString()
+            .setCallback { e, result ->
+                val respuesta = RespuestaHTTP()
+
+                if (e == null && result != null) {
+                    respuesta.codigo = 200
+                    respuesta.contenido = result
+                } else {
+                    respuesta.codigo = Constantes.ERROR_PETICION
+                    respuesta.contenido = e?.message ?: "Error de red desconocido."
+                }
+                callback(respuesta)
+            }
+    }
+
 }
