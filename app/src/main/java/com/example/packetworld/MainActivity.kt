@@ -27,7 +27,17 @@ class MainActivity : AppCompatActivity() {
         envioImp = EnvioImp(this)
 
         mostrarInformacionColaborador()
+
+        binding.ivUsuarioIcono.setOnClickListener {
+            val intent = Intent(this@MainActivity, CuentaActivity::class.java)
+            intent.putExtra("colaborador", jsonRespuestaLogin)
+            startActivity(intent)
+        }
+
+
     }
+
+
 
     private fun mostrarInformacionColaborador() {
         try {
