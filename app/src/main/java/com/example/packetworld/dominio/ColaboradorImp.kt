@@ -7,6 +7,7 @@ import com.example.packetworld.conexion.ConexionAPI
 import com.example.packetworld.poko.RespuestaHTTP
 import com.example.packetworld.poko.Colaborador
 import com.example.packetworld.dto.RSAutenticacionColaborador
+import com.example.packetworld.dto.RSCambioPassword
 import com.example.packetworld.dto.RSColaborador
 import com.example.packetworld.dto.Respuesta
 import com.example.packetworld.util.Constantes
@@ -87,6 +88,7 @@ class ColaboradorImp(private val context: Context) {
                     callback(null)
 
                 } catch (e: Exception) {
+                    Log.e("LOGIN_ERROR", "Excepción iniciarSesion: ", e)
                     Toast.makeText(
                         context,
                         "Error interno del sistema",
@@ -193,5 +195,99 @@ class ColaboradorImp(private val context: Context) {
         }
     }
 
+    fun cambiarPassword(idColaborador: Int, passwordActual: String, passwordNueva: String, callback: (Respuesta?) -> Unit) {
+        val datosCambio = RSCambioPassword(
+            idColaborador = idColaborador,
+            passwordActual = passwordActual,
+            passwordNueva = passwordNueva
+        )
+
+        val jsonBody = gson.toJson(datosCambio)
+        val url = "${Constantes.URL_API}colaborador/password/cambiar"
+
+        Log.d("API_PASSWORD", "JSON ENVIADO: $jsonBody")
+
+        ConexionAPI.peticionBODY(
+            context,
+            url,
+            "POST",
+            jsonBody,
+            contentTypeJson
+        ) { respuestaConexion: RespuestaHTTP ->
+
+            Log.d("API_PASSWORD", "Respuesta Cruda: ${respuestaConexion.contenido}")
+
+            if (respuestaConexion.codigo == 200) {
+                try {
+                    val respuestaServidor: Respuesta = gson.fromJson(respuestaConexion.contenido, Respuesta::class.java)
+                    callback(respuestaServidor)
+                } catch (e: JsonSyntaxException) {
+                    Log.e("API_PASSWORD", "Error al parsear JSON: ${e.message}")
+                    Toast.makeText(context, "Error al procesar respuesta del servidor.", Toast.LENGTH_LONG).show()
+                    callback(null)
+                } catch (e: Exception) {
+                    Log.e("API_PASSWORD", "Error interno: ${e.message}")
+                    Toast.makeText(context, "Error interno del sistema.", Toast.LENGTH_LONG).show()
+                    callback(null)
+                }
+            } else if (respuestaConexion.codigo == 400) {
+                // Manejar BadRequestException desde el WS (Datos insuficientes)
+                Toast.makeText(context, "Error 400: Datos insuficientes para el cambio.", Toast.LENGTH_LONG).show()
+                callback(null)
+
+            } else {
+                // Manejar otros errores HTTP (404, 500, sin conexión, etc.)
+                Toast.makeText(
+                    context,
+                    "Error en la conexión con el servidor. Código: ${respuestaConexion.codigo}",
+                    Toast.LENGTH_LONG
+                ).show()
+                callback(null)
+            }
+        }
+    }
+
+    fun subirFotoColaborador(
+        idColaborador: Int,
+        fotoBytes: ByteArray,
+        callback: (Respuesta?) -> Unit
+    ) {
+        val url = "${Constantes.URL_API}colaborador/subir-foto/$idColaborador"
+
+        ConexionAPI.peticionBODYBytes(
+            context = context,
+            url = url,
+            metodoHTTP = "PUT",
+            parametros = fotoBytes,
+            contentType = "application/octet-stream"
+        ) { respuestaConexion ->
+
+            if (respuestaConexion.codigo == 200) {
+                val respuesta = gson.fromJson(
+                    respuestaConexion.contenido,
+                    Respuesta::class.java
+                )
+                callback(respuesta)
+            } else {
+                callback(null)
+            }
+        }
+    }
+
+    fun obtenerFotoColaborador(idColaborador: Int, callback: (Colaborador?) -> Unit) {
+        val url = "${Constantes.URL_API}colaborador/obtener-foto/$idColaborador"
+
+        ConexionAPI.peticionGET(context, url) { respuestaConexion ->
+            if (respuestaConexion.codigo == 200) {
+                val colaborador = gson.fromJson(
+                    respuestaConexion.contenido,
+                    Colaborador::class.java
+                )
+                callback(colaborador)
+            } else {
+                callback(null)
+            }
+        }
+    }
 
 }
