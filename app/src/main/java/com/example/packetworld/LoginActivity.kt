@@ -39,6 +39,9 @@ class LoginActivity : AppCompatActivity() {
 
             if (colaborador != null) {
 
+                // Limpiar la foto para no enviar demasiado peso
+                val colaboradorSinFoto = colaborador.copy(foto = null)
+
                 Toast.makeText(
                     this,
                     "Bienvenido(a) ${colaborador.nombre}",
@@ -48,7 +51,7 @@ class LoginActivity : AppCompatActivity() {
                 val respuestaLogin = RSAutenticacionColaborador(
                     error = false,
                     mensaje = "Login correcto",
-                    colaborador = colaborador
+                    colaborador = colaboradorSinFoto
                 )
 
                 val gson = Gson()
@@ -60,6 +63,7 @@ class LoginActivity : AppCompatActivity() {
 
                 finish()
             }
+
         }
     }
 

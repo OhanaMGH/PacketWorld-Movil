@@ -11,7 +11,8 @@ data class RSEnvioDetalle(
 
     val fechaEnvio: String?,
     val fechaEntrega: String?,
-
+    val comentario: String?,
+    val idEstatus: Int,
     val nombreDestinatario: String?,
     val apellidoPaternoDestinatario: String?,
     val apellidoMaternoDestinatario: String?,

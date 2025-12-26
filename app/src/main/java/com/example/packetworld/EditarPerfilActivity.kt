@@ -16,8 +16,6 @@ class EditarPerfilActivity : AppCompatActivity() {
     private lateinit var colaboradorImp: ColaboradorImp
     private lateinit var colaborador: Colaborador
 
-    private var idColaborador: Int = -1
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -25,20 +23,38 @@ class EditarPerfilActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         colaboradorImp = ColaboradorImp(this)
+        val jsonColaborador = intent.getStringExtra("colaborador")
 
-        // 1️⃣ Obtener el ID del colaborador
-        idColaborador = intent.getIntExtra("ID_COLABORADOR", -1)
+        Log.d("EDITAR_PERFIL", "JSON recibido: $jsonColaborador")
 
-        // 2️⃣ Obtener el Colaborador completo (incluyendo contraseña)
-        val jsonColaborador = intent.getStringExtra("colaborador_json")
-        if (jsonColaborador != null) {
-            colaborador = Gson().fromJson(jsonColaborador, Colaborador::class.java)
+        if (jsonColaborador == null) {
+            Toast.makeText(
+                this,
+                "Error: No se recibió la información del colaborador.",
+                Toast.LENGTH_LONG
+            ).show()
+            finish()
+            return
         }
 
-        configurarListeners()
-        cargarDatosActuales()
-    }
+        colaborador = Gson().fromJson(jsonColaborador, Colaborador::class.java)
 
+        Log.d("EDITAR_PERFIL", "ID recibido: ${colaborador.idColaborador}")
+
+        // Validación REAL (defensiva)
+        if (colaborador.idColaborador <= 0) {
+            Toast.makeText(
+                this,
+                "Error: ID de colaborador inválido.",
+                Toast.LENGTH_LONG
+            ).show()
+            finish()
+            return
+        }
+
+        mostrarDatosActuales(colaborador)
+        configurarListeners()
+    }
 
     private fun configurarListeners() {
 
@@ -52,79 +68,53 @@ class EditarPerfilActivity : AppCompatActivity() {
         }
     }
 
-    private fun cargarDatosActuales() {
-
-        if (idColaborador <= 0) {
-            Toast.makeText(this, "ID de colaborador inválido", Toast.LENGTH_LONG).show()
-            finish()
-            return
-        }
-
-        colaboradorImp.obtenerDatosPerfil(idColaborador) { respuestaRS ->
-
-            runOnUiThread {
-                if (respuestaRS != null && !respuestaRS.error && respuestaRS.colaborador != null) {
-
-                    colaborador = respuestaRS.colaborador
-
-                    binding.etNombre.setText(colaborador.nombre)
-                    binding.etApellidoPaterno.setText(colaborador.apellidoPaterno)
-                    binding.etApellidoMaterno.setText(colaborador.apellidoMaterno)
-                    binding.etCurp.setText(colaborador.curp)
-                    binding.etCorreo.setText(colaborador.correo)
-                    binding.etTelefono.setText(colaborador.telefono)
-                    binding.etNumeroLicencia.setText(colaborador.numeroLicencia)
-
-                } else {
-                    Toast.makeText(
-                        this,
-                        respuestaRS?.mensaje ?: "No se pudieron cargar los datos",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    finish()
-                }
-            }
-        }
+    private fun mostrarDatosActuales(colaborador: Colaborador) {
+        binding.etNombre.setText(colaborador.nombre)
+        binding.etApellidoPaterno.setText(colaborador.apellidoPaterno)
+        binding.etApellidoMaterno.setText(colaborador.apellidoMaterno)
+        binding.etCurp.setText(colaborador.curp)
+        binding.etCorreo.setText(colaborador.correo)
+        binding.etTelefono.setText(colaborador.telefono)
+        binding.etNumeroLicencia.setText(colaborador.numeroLicencia)
     }
 
     private fun guardarCambios() {
+        val correo = binding.etCorreo.text.toString().trim()
 
-        colaborador.idColaborador = idColaborador
+        if (!esCorreoValido(correo)) {
+            binding.etCorreo.error = "Correo electrónico inválido"
+            binding.etCorreo.requestFocus()
+            return
+        }
+        // 🔹 El ID ya viene en el objeto
         colaborador.nombre = binding.etNombre.text.toString()
         colaborador.apellidoPaterno = binding.etApellidoPaterno.text.toString()
         colaborador.apellidoMaterno = binding.etApellidoMaterno.text.toString()
         colaborador.curp = binding.etCurp.text.toString()
-        colaborador.correo = binding.etCorreo.text.toString()
+        colaborador.correo = correo
         colaborador.telefono = binding.etTelefono.text.toString()
         colaborador.numeroLicencia = binding.etNumeroLicencia.text.toString()
 
 
-        Log.d("EDITAR_PERFIL", "ID: ${colaborador.idColaborador}")
-        Log.d("EDITAR_PERFIL", "Nombre: ${colaborador.nombre}")
-        Log.d("EDITAR_PERFIL", "AP: ${colaborador.apellidoPaterno}")
-        Log.d("EDITAR_PERFIL", "AM: ${colaborador.apellidoMaterno}")
-        Log.d("EDITAR_PERFIL", "CURP: ${colaborador.curp}")
-        Log.d("EDITAR_PERFIL", "Correo: ${colaborador.correo}")
-        Log.d("EDITAR_PERFIL", "Teléfono: ${colaborador.telefono}")
-        Log.d("EDITAR_PERFIL", "Licencia: ${colaborador.numeroLicencia}")
-        Log.d("EDITAR_PERFIL", "Password: ${colaborador.password}")
-        Log.d("EDITAR_PERFIL", "Foto: ${colaborador.foto}")
-
-        val password = binding.etPassword.text.toString()
-        colaborador.password = if (password.isNotEmpty()) password else colaborador.password
-
-        // 🔑 Backend espera el campo
-        colaborador.foto = null
+        Log.d(
+            "EDITAR_PERFIL",
+            "Enviando actualización | ID=${colaborador.idColaborador}"
+        )
 
         colaboradorImp.actualizarPerfil(colaborador) { respuesta ->
             runOnUiThread {
                 if (respuesta != null && !respuesta.error) {
-                    Toast.makeText(this, respuesta.mensaje, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        respuesta.mensaje,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    setResult(Activity.RESULT_OK)
                     finish()
                 } else {
                     Toast.makeText(
                         this,
-                        respuesta?.mensaje ?: "Error en operación de colaborador",
+                        respuesta?.mensaje,
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -132,5 +122,9 @@ class EditarPerfilActivity : AppCompatActivity() {
         }
     }
 
+    private fun esCorreoValido(correo: String): Boolean {
+        return correo.isNotBlank() &&
+                android.util.Patterns.EMAIL_ADDRESS.matcher(correo).matches()
+    }
 
 }

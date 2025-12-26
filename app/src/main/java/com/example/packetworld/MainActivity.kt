@@ -1,5 +1,6 @@
 package com.example.packetworld
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.TextView
@@ -17,6 +18,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var envioImp: EnvioImp
     private lateinit var colaborador: Colaborador
+    private lateinit var jsonRespuestaLogin: String
+
+    companion object {
+        private const val REQUEST_DETALLE_ENVIO = 100
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,38 +46,22 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun mostrarInformacionColaborador() {
-        try {
-            val jsonColaborador = intent.getStringExtra("colaborador")
+        val json = intent.getStringExtra("colaborador")
 
-            if (jsonColaborador != null) {
-                val gson = Gson()
+        if (json != null) {
+            jsonRespuestaLogin = json
 
-                val respuestaLogin = gson.fromJson(
-                    jsonColaborador,
-                    RSAutenticacionColaborador::class.java
-                )
+            val respuesta = Gson().fromJson(
+                json,
+                RSAutenticacionColaborador::class.java
+            )
 
-                colaborador = respuestaLogin.colaborador!!
+            colaborador = respuesta.colaborador!!
 
-                // Saludo
-                binding.tvSaludo.text = "Hola, ${colaborador.nombre}"
-
-                // Cargar envíos
-                cargarEnvios(colaborador.idColaborador)
-            } else {
-                Toast.makeText(
-                    this,
-                    "No se recibió información del colaborador",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-
-        } catch (e: Exception) {
-            Toast.makeText(
-                this,
-                "Error al cargar la información del colaborador",
-                Toast.LENGTH_LONG
-            ).show()
+            binding.tvSaludo.text = "Hola, ${colaborador.nombre}"
+            cargarEnvios(colaborador.idColaborador)
+        } else {
+            Toast.makeText(this, "Error al recibir datos de sesión", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -92,7 +82,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 
     private fun mostrarDatosDeEnvios(listaEnvios: List<RSEnvioLista>) {
 
@@ -126,9 +115,8 @@ class MainActivity : AppCompatActivity() {
             tvCodigoEnvio.text = envio.numeroGuia
             tvDireccion.text = envio.direccionDestino
 
-            // ===== COLORES SEGÚN ESTATUS =====
+            // Colores según estatus
             when (envio.estatus) {
-
                 "Entregado" -> {
                     tvEstado.text = "Entregado"
                     tvEstado.setTextColor(getColor(android.R.color.white))
@@ -147,6 +135,12 @@ class MainActivity : AppCompatActivity() {
                     tvEstado.setBackgroundColor(getColor(android.R.color.holo_red_dark))
                 }
 
+                "Cancelado" -> {
+                    tvEstado.text = "Cancelado"
+                    tvEstado.setTextColor(getColor(android.R.color.white))
+                    tvEstado.setBackgroundColor(getColor(android.R.color.holo_red_dark))
+                }
+
                 else -> {
                     tvEstado.text = envio.estatus
                     tvEstado.setTextColor(getColor(android.R.color.black))
@@ -157,15 +151,30 @@ class MainActivity : AppCompatActivity() {
             itemView.setOnClickListener {
                 Toast.makeText(
                     this,
-                    "Guía seleccionada: ${envio.numeroGuia}",
+                    "Cargando detalles de : ${envio.numeroGuia}",
                     Toast.LENGTH_SHORT
                 ).show()
+
+                envioImp.obtenerDetalleEnvio(envio.numeroGuia) { detalleEnvio ->
+                    if (detalleEnvio != null) {
+                        val gson = Gson()
+                        val envioJson = gson.toJson(detalleEnvio)
+                        val intent = Intent(this, DetalleEnvioActivity::class.java)
+                        intent.putExtra("ENVIO_SELECCIONADO", envioJson)
+                        startActivityForResult(intent, REQUEST_DETALLE_ENVIO)
+                    } else {
+                        Toast.makeText(
+                            this,
+                            "No se pudieron cargar los detalles del envío.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
             }
 
             contenedor.addView(itemView)
         }
     }
-
 
     private fun sinDatos(mensaje: String) {
         val tvMensaje = TextView(this)
@@ -175,5 +184,12 @@ class MainActivity : AppCompatActivity() {
         tvMensaje.setTextColor(getColor(android.R.color.darker_gray))
 
         binding.layoutEnvios.addView(tvMensaje)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_DETALLE_ENVIO && resultCode == RESULT_OK) {
+            cargarEnvios(colaborador.idColaborador) // recargar lista y cuadros de estatus
+        }
     }
 }

@@ -1,23 +1,24 @@
 package com.example.packetworld
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.packetworld.conexion.ConexionAPI
 import com.example.packetworld.databinding.ActivityActualizarEstatusEnvioBinding
+import com.example.packetworld.dominio.EnvioImp
 import com.example.packetworld.dto.RSActualizarEstatus
-import com.example.packetworld.util.Constantes
+
 import com.google.gson.Gson
 
 class ActualizarEstatusEnvioActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityActualizarEstatusEnvioBinding
+    private lateinit var envioImp: EnvioImp
     private lateinit var gson: Gson
     private var numeroGuia: String = ""
-
     private val ID_DETENIDO = 4
     private val ID_CANCELADO = 6
 
@@ -25,6 +26,7 @@ class ActualizarEstatusEnvioActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityActualizarEstatusEnvioBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        envioImp = EnvioImp(this)
 
         gson = Gson()
 
@@ -42,10 +44,11 @@ class ActualizarEstatusEnvioActivity : AppCompatActivity() {
             "Cancelado" to 6
         )
         val nombres = estatusList.map { it.first }
-        binding.spEstatus.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, nombres)
-
-
+        val adapter = ArrayAdapter(this, R.layout.spinner_item, nombres)
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
+        binding.spEstatus.adapter = adapter
         binding.spEstatus.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val idEstatus = estatusList[position].second
                 val nombreEstatus = estatusList[position].first
@@ -68,37 +71,35 @@ class ActualizarEstatusEnvioActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-
-
         // Botón Guardar cambios
         binding.btnGuardarCambios.setOnClickListener {
+
             val comentario = binding.etComentario.text.toString()
             val selectedId = estatusList[binding.spEstatus.selectedItemPosition].second
 
-            if ((selectedId == ID_DETENIDO || selectedId == ID_CANCELADO) && comentario.isBlank()) {
-                Toast.makeText(this, "Se requiere un comentario para el estatus seleccionado", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
+            val estatus = RSActualizarEstatus(
+                numeroGuia = numeroGuia,
+                nuevoIdEstatus = selectedId,
+                comentario = comentario,
+                idColaborador = 1
+            )
 
-            val solicitud = RSActualizarEstatus(numeroGuia, selectedId, comentario, 1)
-            val jsonSolicitud = gson.toJson(solicitud)
-
-            ConexionAPI.peticionBODY(
-                context = this,
-                url = "${Constantes.URL_API}envio/estatus",
-                metodoHTTP = "PUT",
-                parametros = jsonSolicitud,
-                contentType = "application/json"
-            ) { respuesta ->
-                if (respuesta.codigo == 200) {
-                    Toast.makeText(this, "Estatus actualizado correctamente", Toast.LENGTH_LONG).show()
-                    setResult(RESULT_OK)
-                    finish()
-                } else {
-                    Toast.makeText(this, "Error: ${respuesta.contenido}", Toast.LENGTH_LONG).show()
+            envioImp.actualizarEstatusEnvio(estatus) { exito, mensaje ->
+                runOnUiThread {
+                    if (exito) {
+                        Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
+                        // Enviar comentario de vuelta a la actividad anterior
+                        val resultIntent = Intent()
+                        resultIntent.putExtra("COMENTARIO", comentario)
+                        setResult(RESULT_OK, resultIntent)
+                        finish()
+                    } else {
+                        Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
+                    }
                 }
             }
         }
+
 
         // Botón regresar
         binding.ivBack.setOnClickListener { finish() }
