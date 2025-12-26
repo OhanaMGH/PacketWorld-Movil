@@ -2,6 +2,7 @@ package com.example.packetworld
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -45,10 +46,7 @@ class DetalleEnvioActivity : AppCompatActivity() {
 
 
     private fun cargarDetalleEnvio() {
-        if (numeroGuia.isEmpty()) {
-            Toast.makeText(this, "Error: No se encontró el número de guía", Toast.LENGTH_SHORT).show()
-            return
-        }
+        if (numeroGuia.isEmpty()) return
 
         envioImp.obtenerDetalleEnvio(numeroGuia) { detalle ->
             runOnUiThread {
@@ -85,8 +83,10 @@ class DetalleEnvioActivity : AppCompatActivity() {
                 }
             }
         }
-
     }
+
+
+
 
     private fun mostrarDetallesEnvio(envio: RSEnvioDetalle) {
         binding.tvCodigoEnvio.text = envio.numeroGuia
@@ -131,15 +131,10 @@ class DetalleEnvioActivity : AppCompatActivity() {
         return "• ${paquete.descripcion} (${"%.2f".format(pesoDouble)} kg) - ${paquete.alto}x${paquete.ancho}x${paquete.profundidad} cm"
     }
 
-
-
-    // Al recibir resultado de ActualizarEstatusEnvioActivity
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 1 && resultCode == RESULT_OK) {
-            // 1️⃣ Recargar detalle del envío
             cargarDetalleEnvio()
-            // 2️⃣ Avisar a la actividad anterior que hubo cambio, para refrescar la lista/cuadros
             setResult(RESULT_OK)
         }
     }
