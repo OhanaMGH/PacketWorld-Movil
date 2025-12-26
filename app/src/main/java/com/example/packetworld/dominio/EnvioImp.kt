@@ -52,4 +52,44 @@ class EnvioImp(private val context: Context) {
 
     // NOTA: Aquí se agregarían otros métodos (obtenerDetalleEnvio, actualizarEstatusEnvio)
 
+        // Endpoint de actualización de estatus
+        val url = "${Constantes.URL_API}envio/estatus"
+
+        // Convertir el RS a JSON
+        val jsonSolicitud = gson.toJson(solicitud)
+
+        Log.d(TAG, "JSON a enviar: $jsonSolicitud")
+
+        // Petición POST (usando peticionBODY)
+        ConexionAPI.peticionBODY(
+            context = context,
+            url = url,
+            metodoHTTP = "PUT",
+            parametros = jsonSolicitud,
+            contentType = "application/json"
+        ) { respuestaConexion ->
+            if (respuestaConexion.codigo == 200) {
+                callback(true, "Estatus actualizado correctamente")
+            } else {
+                Log.e(TAG, "Error al actualizar estatus: ${respuestaConexion.contenido}")
+                callback(false, respuestaConexion.contenido ?: "Error desconocido al actualizar estatus.")
+            }
+        }
+    }
+    fun obtenerUltimoComentario(
+        idEnvio: Int,
+        callback: (String?) -> Unit
+    ) {
+        val url = "${Constantes.URL_API}envio/ultimoComentario/$idEnvio"
+
+        ConexionAPI.peticionGET(context, url) { respuestaConexion ->
+            if (respuestaConexion.codigo == 200) {
+                val comentario = if (respuestaConexion.contenido.isNullOrEmpty()) null
+                else respuestaConexion.contenido
+                callback(comentario)
+            } else {
+                Log.e("ENVIOS_API", "Error al obtener último comentario: ${respuestaConexion.contenido}")
+                callback(null)
+            }
+        }
 }
