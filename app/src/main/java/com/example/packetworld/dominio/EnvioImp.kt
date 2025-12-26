@@ -1,8 +1,11 @@
 package com.example.packetworld.dominio
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import com.example.packetworld.conexion.ConexionAPI
+import com.example.packetworld.dto.RSActualizarEstatus
+import com.example.packetworld.dto.RSEnvioDetalle
 import com.example.packetworld.poko.RespuestaHTTP
 import com.example.packetworld.dto.RSEnvioLista
 import com.example.packetworld.util.Constantes
@@ -16,10 +19,7 @@ class EnvioImp(private val context: Context) {
     private val gson = Gson()
     private val TAG = "ENVIOS_API"
 
-    fun obtenerEnvios(
-        idColaborador: Int,
-        callback: (List<RSEnvioLista>?) -> Unit
-    ) {
+    fun obtenerEnvios(idColaborador: Int, callback: (List<RSEnvioLista>?) -> Unit) {
         val url = "${Constantes.URL_API}envio/porConductor/$idColaborador"
 
         ConexionAPI.peticionGET(context, url) { respuestaConexion: RespuestaHTTP ->
@@ -89,7 +89,7 @@ class EnvioImp(private val context: Context) {
 
 
     }
-    
+
     fun actualizarEstatusEnvio(
         solicitud: RSActualizarEstatus,
         callback: (exito: Boolean, mensaje: String) -> Unit
@@ -142,4 +142,5 @@ class EnvioImp(private val context: Context) {
                 callback(null)
             }
         }
+}
 }

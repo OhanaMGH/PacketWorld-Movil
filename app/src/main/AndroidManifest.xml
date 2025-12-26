@@ -9,7 +9,10 @@
         android:label="PacketWorld"
         android:theme="@style/Theme.PacketWorld">
         <activity
-            android:name=".EdicionUsuarioActivity"
+            android:name=".CuentaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CambioPasswordActivity"
             android:exported="false" />
         <activity
             android:name=".EditarPerfilActivity"
