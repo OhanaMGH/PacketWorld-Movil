@@ -50,7 +50,57 @@ class EnvioImp(private val context: Context) {
         }
     }
 
-    // NOTA: Aquí se agregarían otros métodos (obtenerDetalleEnvio, actualizarEstatusEnvio)
+    fun obtenerDetalleEnvio(
+        numeroGuia: String,
+        callback: (RSEnvioDetalle?) -> Unit
+    ) {
+        val url = "${Constantes.URL_API}envio/detalle/$numeroGuia"
+
+        ConexionAPI.peticionGET(context, url) { respuestaConexion: RespuestaHTTP ->
+
+            if (respuestaConexion.codigo == 200) {
+
+                if (respuestaConexion.contenido.isNullOrEmpty()) {
+                    Toast.makeText(context, "No hay detalles para este envío.", Toast.LENGTH_LONG).show()
+                    callback(null)
+                    return@peticionGET
+                }
+
+                Log.d(TAG, "JSON detalle: ${respuestaConexion.contenido}")
+
+                try {
+                    val detalleEnvio: RSEnvioDetalle = gson.fromJson(
+                        respuestaConexion.contenido,
+                        RSEnvioDetalle::class.java
+                    )
+                    callback(detalleEnvio)
+
+                } catch (e: Exception) {
+                    Toast.makeText(context, "Error al procesar los detalles del envío.", Toast.LENGTH_LONG).show()
+                    callback(null)
+                }
+
+            } else {
+                Log.e(TAG, "Error del servidor: Código ${respuestaConexion.codigo}, Contenido: ${respuestaConexion.contenido}")
+                Toast.makeText(context, "Error del servidor al obtener detalle: Código ${respuestaConexion.codigo}", Toast.LENGTH_LONG).show()
+                callback(null)
+            }
+        }
+
+
+    }
+    
+    fun actualizarEstatusEnvio(
+        solicitud: RSActualizarEstatus,
+        callback: (exito: Boolean, mensaje: String) -> Unit
+    ) {
+        // Validar comentario si es Detenido o Cancelado
+        if ((solicitud.nuevoIdEstatus == 4 || solicitud.nuevoIdEstatus == 6) &&
+            solicitud.comentario.isBlank()
+        ) {
+            callback(false, "Se requiere un comentario para el estatus '${if (solicitud.nuevoIdEstatus == 4) "Detenido" else "Cancelado"}'.")
+            return
+        }
 
         // Endpoint de actualización de estatus
         val url = "${Constantes.URL_API}envio/estatus"
