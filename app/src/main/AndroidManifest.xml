@@ -4,6 +4,8 @@
 
     <application
         android:allowBackup="true"
+        android:icon="@mipmap/ic_logo_round"
+        android:roundIcon="@mipmap/ic_logo"
         android:label="PacketWorld"
         android:theme="@style/Theme.PacketWorld">
         <activity
