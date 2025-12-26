@@ -55,6 +55,31 @@ class DetalleEnvioActivity : AppCompatActivity() {
                 if (detalle != null) {
                     detalleEnvioActual = detalle
                     mostrarDetallesEnvio(detalle)
+
+                    //Mostrar comentario si el estatus indica Detenido o Cancelado
+                    val requiereComentario = when {
+                        detalle.idEstatus == 4 || detalle.idEstatus == 6 -> true
+                        detalle.estatus.contains("Cancelado", ignoreCase = true) -> true
+                        detalle.estatus.contains("Detenido", ignoreCase = true) -> true
+                        else -> false
+                    }
+
+                    if (requiereComentario) {
+                        envioImp.obtenerUltimoComentario(detalle.idEnvio) { comentario ->
+                            runOnUiThread {
+                                if (!comentario.isNullOrBlank()) {
+                                    binding.tvComentario.text = "Comentario (motivo): $comentario"
+                                    binding.tvComentario.visibility = View.VISIBLE
+                                } else {
+                                    binding.tvComentario.visibility = View.GONE
+                                }
+                            }
+                        }
+                    } else {
+                        Log.d("DETALLE_ENVIO", "Estatus no requiere comentario, ocultando TextView")
+                        binding.tvComentario.visibility = View.GONE
+                    }
+
                 } else {
                     Toast.makeText(this, "No se pudieron cargar los detalles.", Toast.LENGTH_SHORT).show()
                 }
